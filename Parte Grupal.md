@@ -405,18 +405,24 @@ INSERT INTO EMP VALUES (7654,'MARTIN','SALESMAN',7698,to_date('28-9-1981','dd-mm
 
 ### **Ejercicio 8**
 
-> **8. Exento por falta de un integrante del grupo.**
+> **8. Exentos por falta de un integrante del grupo.**
 
 ### **Ejercicio 9**
 
 > **9. Elaboración de un vídeo grupal resumiendo las diferencias de concepto y en la gestión de espacios de tabla, índices, claúsulas de almacenamiento y segmentos y extensiones entre los cuatro SGBDs estudiados. Cada miembro del grupo hablará de uno de los siguientes temas:**
+>
 > **a) Espacios de Tabla y cuotas de uso de los mismos.**
+>
 > **b) Índices. Secuencias.**
+>
 > **c) Cláusulas de Almacenamiento.**
+>
 > **d) Segmentos y Extensiones. Clusters de tablas.**
 
 ---
 
 ✒️ **Documentación realizada por Paco Diz Ureña.**
+
 ✒️ **Documentación realizada por Alejandro Montes Delgado.**
+
 ✒️ **Documentación realizada por Juan Jesús Alejo Sillero.**
