@@ -400,8 +400,29 @@ INSERT INTO EMP VALUES (7654,'MARTIN','SALESMAN',7698,to_date('28-9-1981','dd-mm
 
 > **7. Explicad en qué consiste el sharding en MongoDB. Intentad montarlo.**
 
-```sql
-```
+Tras muchos intentos no hemos sido capaces de montar correctamente el sharding en MongoDB, por lo que solo explicaremos en qué consiste. No obstante, en [DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-use-sharding-in-mongodb) explican como usarlo bastante bien.
+
+En MongoDB, **el sharding es una forma de distribuir los datos** de una base de datos entre varios servidores. Esto facilita el escalado horizontal, es decir, añadir más servidores para repartir la carga entre ellos y poder soportar un volumen mayor de tráfico. Además, contribuye a mejorar los tiempos de respuesta de las consultas, el tamaño total disponible de la base de datos y la disponibilidad geográfica de los datos (según tengamos los servidores ubicados).
+
+Podemos visualizar fácilmente el sharding en el siguiente diagrama:
+
+![sharding.png](img/Grupal/sharding.jpeg)
+
+En resumen, las ventajas que ofrece el sharding son:
+
+- **Mayor rendimiento de lectura/escritura:** puede aprovechar el paralelismo distribuyendo el conjunto de datos en varios *shards*. Digamos que un *shard* puede procesar mil operaciones por segundo. Por cada *shard* adicional, se obtendrían mil operaciones por segundo extra de rendimiento.
+
+- **Mayor capacidad de almacenamiento:** de manera similar, al aumentar la cantidad de *shards*, también aumentará la capacidad de almacenamiento total. Digamos que un *shard* puede contener 4 TB de datos. Cada uno adicional aumentaría el almacenamiento total en 4 TB. Esto permite una capacidad de almacenamiento potencialmente infinita.
+
+- **Localidad de datos:** permite crear fácilmente bases de datos distribuidas para admitir aplicaciones en diferentes ubicaciones geográficas, con reglas que aseguren el almacenamiento de datos dentro de regiones específicas.
+
+Es importante aclarar también como se distribuyen los *shards*. Estos se crean a nivel de colección, es decir, los documentos de una colección se distribuyen (siempre que se pueda) equitativamente entre los *shards* de un clúster, estas divisiones se denominan *chunks*.
+
+Además, MongoDB tiene 2 estrategias para crear el *sharding*:
+
+- **Range Sharding:** divide los datos en rangos según los valores de la *key* del *shard*. Luego, a cada *shard* se le asigna un rango basado en los valores de la dicha *key*.
+
+- **Hashed Sharding:** implica calcular un hash de la *key* del *shard*. Luego, a cada *shard* se le asigna un rango basado en los valores del hash de la *key*.
 
 ### **Ejercicio 8**
 
