@@ -251,6 +251,122 @@ exec InformeRestricciones ('ALUMNOS');
 
 > **6. Realiza un procedimiento llamado MostrarAlmacenamientoUsuario que reciba el nombre de un usuario y devuelva el espacio que ocupan sus objetos agrupando por dispositivos y archivos:**
 
+```sql
+SET SERVEROUTPUT ON;
+
+
+-- Procedimiento para mostrar tablas......tamañoK
+
+CREATE OR REPLACE PROCEDURE tablas_archivos(p_nomuser VARCHAR2, p_idArchivo NUMBER)
+IS
+  CURSOR c_mostrar_tablas IS
+  SELECT DISTINCT t.table_name, e.BYTES/1024 AS K FROM DBA_TABLES t, DBA_EXTENTS e WHERE t.owner=UPPER(p_nomuser) and t.owner=e.owner and e.file_id=p_idArchivo;
+BEGIN
+  FOR i IN c_mostrar_tablas LOOP
+    dbms_output.put_line(chr(10)||chr(9)||chr(9)||chr(9)||i.TABLE_NAME||'......'||i.K||' K');
+  END LOOP;
+END;
+/
+
+
+-- Procedimiento para mostrar index......tamañoK
+
+CREATE OR REPLACE PROCEDURE index_archivos(p_nomuser VARCHAR2, p_idArchivo NUMBER)
+IS
+  CURSOR c_mostrar_tablas IS
+  SELECT DISTINCT i.index_name, e.BYTES/1024 AS KI FROM DBA_INDEXES i, DBA_EXTENTS e WHERE i.owner=UPPER(p_nomuser) and i.owner=e.owner and e.file_id=p_idArchivo;
+BEGIN
+  FOR i IN c_mostrar_tablas LOOP
+    dbms_output.put_line(chr(9)||chr(9)||chr(9)||i.INDEX_NAME||'......'||i.KI||' K');
+  END LOOP;
+END;
+/
+
+
+-- Funcion para total espacio archivos
+
+CREATE OR REPLACE FUNCTION f_total_archivo (p_nomuser VARCHAR2,p_idfile NUMBER)
+RETURN NUMBER
+IS
+  v_total NUMBER;
+BEGIN
+  SELECT DISTINCT d.USER_BYTES/1024 INTO v_total
+  FROM DBA_DATA_FILES d, DBA_EXTENTS e 
+  WHERE e.owner=upper(p_nomuser) AND d.FILE_ID=e.FILE_ID AND d.FILE_ID=p_idfile;
+  RETURN v_total;
+END;
+/
+
+
+-- Funcion para total espacio en dispositivo
+
+CREATE OR REPLACE FUNCTION f_total_dispositivo (p_nomuser VARCHAR2,p_idfile NUMBER)
+RETURN NUMBER
+IS
+  v_total NUMBER;
+BEGIN
+  SELECT DISTINCT SUM(d.USER_BYTES)/1024 INTO v_total
+  FROM DBA_DATA_FILES d, DBA_EXTENTS e 
+  WHERE e.owner=upper(p_nomuser) AND d.FILE_ID=e.FILE_ID AND d.FILE_ID=p_idfile;
+  RETURN v_total;
+END;
+/
+
+
+-- Funcion para total espacio en bd
+
+CREATE OR REPLACE FUNCTION f_total_usuario (p_nomuser VARCHAR2)
+RETURN NUMBER
+IS
+  v_total NUMBER;
+BEGIN
+  SELECT SUM(bytes)/1024 INTO v_total
+  FROM DBA_SEGMENTS 
+  WHERE OWNER=upper(p_nomuser);
+  RETURN v_total;
+END;
+/
+
+
+-- Procedimiento para mostrar dispositivos y archivos
+
+CREATE OR REPLACE PROCEDURE dispositivo_archivo (p_nomuser VARCHAR2)
+IS
+  CURSOR c_mostrar_dis_arch IS
+  SELECT DISTINCT REGEXP_SUBSTR(f.file_name, '^/[^/]+') AS DISPOSITIVO, f.file_name AS ARCHIVO, f.file_id, REGEXP_SUBSTR(f.file_name, '[^/]+$') AS NOMBRE_ARCHIVO FROM DBA_EXTENTS e, DBA_DATA_FILES f WHERE f.file_id=e.file_id AND OWNER=UPPER(p_nomuser);
+BEGIN
+  FOR i IN c_mostrar_dis_arch LOOP
+    dbms_output.put_line(chr(10)||chr(9)||'Dispositivo: '||i.DISPOSITIVO||chr(10)||chr(10)||chr(9)||chr(9)||'Archivo: '||i.ARCHIVO);
+    tablas_archivos(p_nomuser,i.FILE_ID);
+    dbms_output.put_line(chr(9));
+    index_archivos(p_nomuser,i.FILE_ID);
+    dbms_output.put_line(chr(10)||chr(9)||chr(9)||'Total Espacio en Archivo '||i.NOMBRE_ARCHIVO||': '||f_total_archivo(p_nomuser,i.FILE_ID)||' K');
+    dbms_output.put_line(chr(10)||chr(9)||'Total Espacio en Dispositivo '||i.DISPOSITIVO||': '||f_total_dispositivo(p_nomuser,i.FILE_ID)||' K');
+  END LOOP;
+  dbms_output.put_line(chr(10)||'Total Espacio Usuario en la BD: '||f_total_usuario(p_nomuser)||' K');
+END;
+/
+
+
+-- Procedimiento principal MostrarAlmacenamientoUsuario
+
+CREATE OR REPLACE PROCEDURE MostrarAlmacenamientoUsuario (p_nomuser VARCHAR2)
+IS
+BEGIN
+dbms_output.put_line(chr(10)||'Usuario: '||p_nomuser);
+dispositivo_archivo(p_nomuser);
+END MostrarAlmacenamientoUsuario;
+/
+
+
+-- COMPROBACIÓN
+
+exec MostrarAlmacenamientoUsuario('pacodiz');
+```
+
+![Alumno 3 - Oracle - 6](img/Alumno%203/Oracle/6.png)
+
+
 ## **PostgreSQL**
 
 ### **Ejercicio 7**
